@@ -1,6 +1,6 @@
 const mongoose = require('../config/db');
 
-const SkillModel = new mongoose.Schema({
+const MessageModel = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -10,10 +10,10 @@ const SkillModel = new mongoose.Schema({
   },
   tag: {
     type: String,
-    minlength: 2,
+    minlength: 3,
     maxlength: 20,
     required: true
   }
 }, { versionKey: false });
 
-module.exports = mongoose.model('skills', SkillModel);
+module.exports = mongoose.model('messages', MessageModel);

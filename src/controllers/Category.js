@@ -1,4 +1,4 @@
-const Skill = require('../models/Skill');
+const Category = require('../models/Category');
 
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
@@ -7,24 +7,15 @@ if (process.env.NODE_ENV !== 'production') {
 const { between } = require('../functions/general');
 
 module.exports = {
-  search: async function (req = {}) {
+  search: async function () {
     try {
-      // Variables
-      const conditions = {};
-      const q = (req.query || {});
-
-      // Conditions
-      if (q.id) conditions._id = q.id;
-      if (q.name) conditions.name = new RegExp('/.*'+q.name+'.*/');
-      if (q.tag) conditions.tag = new RegExp('/.*'+q.tag+'.*/');
-
       // Find
-      const skills = await Skill.find(conditions);
+      const categories = await Category.find();
 
       // Response
       return {
         status: true,
-        data: skills
+        data: categories
       };
     } catch (e) {
       return {
@@ -46,31 +37,26 @@ module.exports = {
       const error = [];
 
       for (let item of req.body.data) {
-        let {
-          name,
-          tag
-        } = item;
+        let { name, link } = item;
 
         // Validation
-        if (!between(name, 3, 20)) {
-          error.push('Name Length must be between 3 and 20 characters');
-        } else if (!between(tag, 2, 20)) {
-          error.push('Tag Length must be between 2 and 26 characters');
+        if (!between(name, 3, 25)) {
+          error.push('Name Length must be between 3 and 25 characters');
         } else {
           success.push({
             name: name,
-            tag: tag
+            link: link
           });
         }
       }
 
-      // Save Skills
-      const skills = await Skill.create(success);
+      // Save Categories
+      const categories = await Category.create(success);
 
       // Response
       return {
         status: true,
-        data: skills
+        data: categories
       };
     } catch (e) {
       return {
@@ -90,28 +76,24 @@ module.exports = {
 
       const success = [];
       const error = [];
-      var skills = 0;
+      var categories = 0;
 
       for (let item of req.body.data) {
         let {
           id,
           _id,
-          tag,
-          name
+          name,
+          link
         } = item;
 
         // Validation
         if (!id && !_id) {
           error.push('ID is required to Update a Record');
-        } else if (name && !between(name, 3, 20)) {
-          error.push('Name Length must be between 3 and 20 characters');
-        } else if (tag && !between(tag, 2, 20)) {
-          error.push('Tag Length must be between 2 and 26 characters');
         } else {
           temp = {};
 
           if (name) temp.name = name;
-          if (tag) temp.tag = tag;
+          if (link) temp.link = link;
 
           success.push({
             id: (id || _id),
@@ -125,36 +107,35 @@ module.exports = {
         if (success.length === 0) {
           res.json({
             status: true,
-            data: skills,
+            data: categories,
             error: error
           })
         }
 
         success.forEach(async item => {
-          await Skill.updateOne(
+          await Category.updateOne(
             { _id: item.id },
             item.data
           );
 
-          skills++;
+          categories++;
 
           // Response
-          if (skills === success.length) {
+          if (categories === success.length) {
             res.json({
               status: true,
-              data: skills,
+              data: categories,
               error: error
             })
           }
         })
       })
     } catch (e) {
-      // Response
-      res.json({
+      return {
         status: false,
         msg: e.message,
         data: []
-      });
+      };
     }
   }
 }

@@ -1,8 +1,13 @@
 const mongoose = require('../config/db');
-require('./Skill');
 
+// Relations
+require('./Skill');
+require('./Category');
+
+// Functions
 const { getYear } = require('../functions/general');
 
+// Schema
 const ProjectModel = new mongoose.Schema({
   name: {
     type: String,
@@ -51,9 +56,15 @@ const ProjectModel = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "categories"
+  },
   skills: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "skills"
+    ref: "skills",
+    require: true,
+    default: "5e4b1a7801bbd4668e04a92f"
   }]
 }, { versionKey: false });
 

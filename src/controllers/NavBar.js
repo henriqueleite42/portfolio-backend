@@ -1,10 +1,10 @@
-const Project = require('./Project');
+const Category = require('./Category');
 const Experience = require('./Experience');
 
 module.exports = {
   search: async function () {
     try {
-      const project = await Project.search({ query: { all: true } });
+      const categories = await Category.search();
       // const experience = Experience.search();
       const experience = {
         data: [{
@@ -26,7 +26,7 @@ module.exports = {
           subItens: [{
             name: 'All',
             link: ''
-          }].concat(project.data)
+          }].concat(categories.data)
         },
         {
           name: "Work Experience",

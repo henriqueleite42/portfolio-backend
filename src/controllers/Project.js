@@ -14,7 +14,10 @@ module.exports = {
 
       var conditions = { active: true };
       var limit = parseInt(process.env.PAGE_LIMIT);
-      var populate = 'skills';
+      var populate = [
+        'skills',
+        'category'
+      ];
       var sort = { difficulty: -1 };
       var page = 1;
       var fields = {
@@ -23,7 +26,8 @@ module.exports = {
         difficulty: 1,
         img: 1,
         creation: 1,
-        skills: 1
+        skills: 1,
+        category: 1
       };
 
       // Conditions
@@ -31,6 +35,7 @@ module.exports = {
       if (q.name) conditions.name = new RegExp(q.name, 'i');
       if (q.creation) conditions.creation = { $in: q.creation.split(',') };
       if (q.skills) conditions.skills = { $in: q.skills.split(',') };
+      if (q.category) conditions.category = q.category;
       if (q.active === 'all') delete conditions.active;
       else if (q.active) conditions.active = false;
       if (q.difficulty) {
@@ -75,6 +80,8 @@ module.exports = {
 
       // Search Mode
       switch (q.mode) {
+        case 'complete':
+          break;
         case 'list':
           fields.skills = { $slice: 5 };
           break;
@@ -85,7 +92,10 @@ module.exports = {
             link: 1
           };
 
-          populate = '';
+          populate = [
+            '',
+            ''
+          ];
 
           sort = {
             name: 1
@@ -102,7 +112,8 @@ module.exports = {
       .skip(((page - 1) * limit))
       .limit(limit)
       .sort(sort)
-      .populate(populate);
+      .populate(populate[0])
+      .populate(populate[1]);
 
       return {
         status: true,
@@ -143,7 +154,8 @@ module.exports = {
           creation,
           difficulty,
           img,
-          skills
+          skills,
+          category
         } = item;
 
         // Validation
@@ -164,7 +176,8 @@ module.exports = {
             creation: creation,
             difficulty: difficulty,
             skills: skills,
-            img: (img || "")
+            img: (img || ""),
+            category: category
           });
         }
       }
@@ -217,7 +230,8 @@ module.exports = {
           active,
           creation,
           skills,
-          difficulty
+          difficulty,
+          category
         } = item;
 
         // Validation
@@ -243,6 +257,7 @@ module.exports = {
           if (skills) temp.skills = skills;
           if (active) temp.active = active;
           if (img) temp.img = img;
+          if (category) temp.category = category;
 
           success.push({
             id: (id || _id),
